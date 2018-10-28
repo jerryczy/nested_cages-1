@@ -16,6 +16,7 @@
 #include <igl/copyleft/cgal/polyhedron_to_mesh.h>
 #include <igl/copyleft/cgal/mesh_to_polyhedron.h>
 #include <igl/copyleft/cgal/intersect_other.h>
+#include <igl/opengl/glfw/Viewer.h>
  
 // useful namespaces
 using namespace Eigen;
@@ -29,6 +30,45 @@ int at(
   const int j)
 {
   return M(i,j);
+}
+
+void view_cages(igl::opengl::glfw::Viewer &viewer) {
+  // based on tutorial code (107)
+  int k = viewer.data_list.size();
+  std::map<int, Eigen::RowVector3d> colors;
+  for (int i = 0; i < k; i++)
+    colors.emplace(i, 0.5*Eigen::RowVector3d::Random().array() + 0.5);
+  int last_selected = -1;
+  viewer.callback_key_down =
+    [&](igl::opengl::glfw::Viewer &, unsigned int key, int mod)
+  {
+    if(key == GLFW_KEY_UP)
+    {
+      viewer.selected_data_index = (viewer.selected_data_index + 1) % k;
+      return true;
+    }
+    else if(key == GLFW_KEY_DOWN)
+    {
+      viewer.selected_data_index = (k + viewer.selected_data_index - 1) % k;
+      return true;
+    }
+    return false;
+  };
+  viewer.callback_pre_draw =
+    [&](igl::opengl::glfw::Viewer &)
+  {
+    if (last_selected != viewer.selected_data_index)
+    {
+      for (auto &data : viewer.data_list)
+      {
+        data.set_colors(colors[data.id]);
+      }
+      viewer.data_list[viewer.selected_data_index].set_colors(Eigen::RowVector3d(1., 1., 1.));
+      last_selected = viewer.selected_data_index;
+    }
+    return false;
+  };
+  viewer.launch();
 }
 
 int main(int argc, char * argv[])
@@ -61,6 +101,24 @@ Energies implemented: None, DispStep, DispInitial, Volume, SurfARAP, VolARAP
     return EXIT_FAILURE;
   }
   
+  igl::opengl::glfw::Viewer viewer;
+  
+  if (strncmp(argv[1], "view", 4) == 0) {
+    char *filename;
+    char *suffix;
+    asprintf(&filename, "%s%s", argv[2], "_0.obj");
+    std::ifstream testfile(filename);
+    int i = 0;
+    while (testfile) {
+      viewer.load_mesh_from_file(filename);
+      asprintf(&suffix,"_%d.obj",++i);
+      asprintf(&filename, "%s%s", argv[2], suffix);
+      testfile = std::ifstream(filename);
+    }
+    view_cages(viewer);
+    return 0;
+  }
+    
   // number of layers
   int k = argc-6;
   #ifdef VERBOSE_DEBUG
@@ -218,6 +276,11 @@ Energies implemented: None, DispStep, DispInitial, Volume, SurfARAP, VolARAP
     mesh_to_polyhedron(C,F_coarse,M); 
     V = C;
     F = F_coarse;
+    
+    // viewer data
+    viewer.append_mesh();
+    viewer.data().set_mesh(V, F);
+    viewer.data().set_face_based(true);
 
     // Output cage to file output_i.obj
     if ((asprintf(&suffix,"_%d.obj",i+1)!=-1) && (asprintf(&filename, "%s%s", argv[argc-1], suffix)!=-1)){
@@ -229,6 +292,8 @@ Energies implemented: None, DispStep, DispInitial, Volume, SurfARAP, VolARAP
     // back to adaptive decimation (standard)
     adaptive = true;
   }
+  
+  view_cages(viewer);
   
   free(filename);
   return 1;
