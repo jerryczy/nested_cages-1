@@ -1,0 +1,13 @@
+[submodule "meshfix"]
+	path = meshfix
+	url = https://github.com/alecjacobson/meshfix.git
+        fetchRecursiveSubmodules = true
+[submodule "collisiondetection"]
+	path = collisiondetection
+	url = https://github.com/evouga/collisiondetection.git
+[submodule "libigl"]
+	path = libigl
+	url = https://github.com/libigl/libigl.git
+[submodule "eltopo"]
+	path = eltopo
+	url = https://github.com/leokollersacht/eltopo.git
