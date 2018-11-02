@@ -152,6 +152,10 @@ Energies implemented: None, DispStep, DispInitial, Volume, SurfARAP, VolARAP
   // First fine mesh is the input mesh
   MatrixXd V = V0;
   MatrixXi F = F0;
+  
+  // add initial mesh to viewer
+  viewer.data().set_mesh(V, F);
+  viewer.data().set_face_based(true);
 
   // vector where each entry is the number of faces for eachj level
   int L[k];
@@ -277,7 +281,7 @@ Energies implemented: None, DispStep, DispInitial, Volume, SurfARAP, VolARAP
     V = C;
     F = F_coarse;
     
-    // viewer data
+    // add mesh to viewer
     viewer.append_mesh();
     viewer.data().set_mesh(V, F);
     viewer.data().set_face_based(true);
