@@ -14,7 +14,9 @@ void cage_face_interpolate(
   
   std::vector<std::vector<int>> V_CF, V_CI;
   igl::vertex_triangle_adjacency(V_C.rows(), F_C, V_CF, V_CI);
-  
+  Eigen::VectorXd dblA;
+  igl::doublearea(V_C, F_C, dblA);
+
   for (int vci = 0; vci < V_C.rows(); vci++) {
   
     std::vector vci_faces = V_CF[vci];
@@ -22,10 +24,25 @@ void cage_face_interpolate(
 
     for (int s = 0; s < SAMPLE_SIZE; s++) {
     
-      // pick a face incident on vc; TODO: probability must be based on face areas
-      int fci = rand() % vci_faces.size();
+      // pick a face incident on vc;
+      double total_area;
+      std::vector<double> cum_area;
+      int n = vci_faces.size();
+      for (int i = 0; i < n; i++) {
+        double area = dblA(vci_faces[i]);
+        total_area += area;
+        cum_area.push_back(total_area)
+      }
+      int idx = std::rand() % std::floor(total_area);
+      int fci;
+      for (int i = n-1; i >= 0; i--) {
+        if (idx <= cum_area(i)) {
+          fci = i;
+          break;
+        }
+      }
       int fc = vci_faces[fci];
-      int ic = vci_face_inds[ic];
+      int ic = vci_face_inds[fci];
       Eigen::Vector3d v1 = V_C.row(vci);
       Eigen::Vector3d v2 = V_C.row(F_C(fc, (ic + 1) % 3));
       Eigen::Vector3d v3 = V_C.row(F_C(fc, (ic + 2) % 3));
