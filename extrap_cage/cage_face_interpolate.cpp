@@ -61,7 +61,7 @@ void cage_face_interpolate(
       int closest_face = 0;
       for (int f = 0; f < F.rows(); f++) {
         double dist, c;
-        igl::point_simplex_squared_distance(x, V, F, i, &dist, &c);
+        igl::point_simplex_squared_distance(x, V, F, f, &dist, &c);
         if (dist < smallest_dist) {
           smallest_dist = dist;
           closest_face = f;
