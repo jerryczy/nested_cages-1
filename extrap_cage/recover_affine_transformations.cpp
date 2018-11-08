@@ -27,5 +27,42 @@ void recover_face_transformations(
     // find the matrix A such that A*(T1-c1) = (T2-c2)
     FA.row(i) = ((T2 - c2) * (T1 - c1).inverse()).resize(1, 9);
     FT.row(i) = c2 - c1;
+
+
+    // Affine transformation, need stack four points to solve linear transformation
+    // use three vertices and center point
+    /*
+    |x'|   |a b c|   |x|   |j|     |x y z 0 0 0 0 0 0 1 0 0|   |a|   |x'|
+    |y'| = |d e f| * |y| + |k| ==> |0 0 0 x y z 0 0 0 0 1 0| * |-| = |y'|
+    |x'|   |g h i|   |z|   |l|     |0 0 0 0 0 0 x y z 0 0 1|   |l|   |z'|
+    */
+    /*
+    // code, put in comment for now
+    #include <Eigen/SVD>
+    Eigen::MatrixXd T1 = Eigen::MatrixXd::Zeros(12, 12);
+    Eigen::MatrixXd T2(3, 4);
+    Eigen::Vector3d c1 = Eigen::Vector3d::Zeros(3);
+    Eigen::Vector3d c2 = Eigen::Vector3d::Zeros(3);
+    for (int j = 0; j < 3; j++) {
+      for (int k = 0; k < 3; k++) {
+        T1.block(3*j + k, 3*k, 3, 1) = V1.row(F(i, j));
+        T1(3*j + k, 9 + k) = 1;
+      }
+      T2.col(j) = V2.row(F(i, j)).transpose();
+      c1 += (1 / 3.0) * V1.row(F(i, j));
+      c2 += (1 / 3.0) * V2.row(F(i, j));
+    }
+    for (int k = 0; k < 3; k++) {
+        T1.block(9 + k, 3*k, 3, 1) = c1;
+        T1(9 + k, 9 + k) = 1;
+      }
+    T2.col(4) = c2.transpose();
+    T2.resize(12, 1)
+    
+    Eigen::JacobiSVD<Eigen::MatrixXd> svd(T1, Eigen::ComputeFullU | Eigen::ComputeFullV);
+    Eigen::VectorXd A = svd.solve(T2);
+    FA.row(i) = A.head(9);
+    FT.row(i) = A.tail(3);
+    */
   }
 }
