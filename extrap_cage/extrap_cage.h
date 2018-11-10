@@ -1,4 +1,4 @@
-#include <Eigen>
+#include <Eigen/Core>
 
 // Given two "sufficiently similar" meshes (V1, F) and (V2, F) with a one-to-one
 // vertex and face correspondence, and a cage (V1_C, F_C) exterior to (V1, F), 
@@ -16,7 +16,7 @@
 void extrap_cage(
   const Eigen::MatrixXd & V1,
   const Eigen::MatrixXd & V2,
-  const Eigen::MatrixXd & F,
+  const Eigen::MatrixXi & F,
   const Eigen::MatrixXd & V1_C,
-  const Eigen::MatrixXd & F_C,
+  const Eigen::MatrixXi & F_C,
   Eigen::MatrixXd & V2_C);

@@ -7,6 +7,7 @@
 #include "cgal.h"
 #include "flow.h"
 #include "reinflate.h"
+#include "extrap_cage/extrap_cage.h"
 
 // libigl includes
 #include <igl/doublearea.h>
@@ -115,6 +116,39 @@ Energies implemented: None, DispStep, DispInitial, Volume, SurfARAP, VolARAP
       asprintf(&filename, "%s%s", argv[2], suffix);
       testfile = std::ifstream(filename);
     }
+    view_cages(viewer);
+    return 0;
+  }
+  
+  // TODO: move this functionality to a separate file
+  if (strncmp(argv[1], "extrap", 4) == 0) {
+    MatrixXd V1, V2, V1_C, V2_C_original, V2_C;
+    MatrixXi F, F1_C, F2_C_original;
+    if (!read_triangle_mesh(argv[2],V1,F) ||
+        !read_triangle_mesh(argv[3],V2,F) ||
+        !read_triangle_mesh(argv[4],V1_C,F1_C) ||
+        !read_triangle_mesh(argv[5],V2_C_original,F2_C_original)){
+      cout << "unable to read input file"  << endl;
+      return 0;
+    }
+    extrap_cage(V1, V2, F, V1_C, F1_C, V2_C);
+
+    //viewer.data().set_mesh(V1, F);
+    //viewer.data().set_face_based(true);
+    //viewer.append_mesh();
+    //viewer.data().set_mesh(V2, F);
+    //viewer.data().set_face_based(true);
+    viewer.append_mesh();
+    viewer.data().set_mesh(V1_C, F1_C);
+    viewer.data().set_face_based(true);
+    //viewer.append_mesh();
+    //viewer.data().set_mesh(V2_C_original, F2_C_original);
+    //viewer.data().set_face_based(true);
+    viewer.append_mesh();
+    viewer.data().set_mesh(V2_C, F1_C);
+    viewer.data().set_face_based(true);
+    
+    // TODO: this is not the best interface but will do for now
     view_cages(viewer);
     return 0;
   }

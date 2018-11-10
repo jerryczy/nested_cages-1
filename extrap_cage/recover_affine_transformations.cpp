@@ -1,9 +1,11 @@
 #include "recover_affine_transformations.h"
+#include <Eigen/LU>
+#include <Eigen/QR>
 
-void recover_face_transformations(
+void recover_affine_transformations(
   const Eigen::MatrixXd & V1,
   const Eigen::MatrixXd & V2,
-  const Eigen::MatrixXd & F,
+  const Eigen::MatrixXi & F,
   Eigen::MatrixXd & FA,
   Eigen::MatrixXd & FT)
 {
@@ -21,11 +23,14 @@ void recover_face_transformations(
     // origin and find the linear transformation taking one centered triangle
     // to the other; TODO: is this a good idea?
     
-    Eigen::Vector3d c1 = (1/3.0) * (T1.row(0) + T1.row(1) + T1.row(2));
-    Eigen::Vector3d c2 = (1/3.0) * (T2.row(0) + T2.row(1) + T2.row(2));
+    Eigen::Vector3d c1 = (1/3.0) * (T1.col(0) + T1.col(1) + T1.col(2));
+    Eigen::Vector3d c2 = (1/3.0) * (T2.col(0) + T2.col(1) + T2.col(2));
     
     // find the matrix A such that A*(T1-c1) = (T2-c2)
-    FA.row(i) = ((T2 - c2) * (T1 - c1).inverse()).resize(1, 9);
+    //Eigen::MatrixXd A = (T2.colwise() - c2) * (T1.colwise() - c1).inverse();
+    Eigen::MatrixXd A = (T1.colwise() - c1).colPivHouseholderQr().solve(T2.colwise() - c2);
+    A.resize(1, 9);
+    FA.row(i) = A;
     FT.row(i) = c2 - c1;
 
 

@@ -37,6 +37,7 @@ include_directories( "${PROJECT_SOURCE_DIR}/eltopo/common/" )
 include_directories( "${PROJECT_SOURCE_DIR}/eltopo/common/tunicate" )
 include_directories( "${PROJECT_SOURCE_DIR}/eltopo/common/newsparse" )
 include_directories( "${PROJECT_SOURCE_DIR}/eltopo/eltopo3d/" )
+include_directories( "${PROJECT_SOURCE_DIR}/extrap_cage" )
 set(MESHFIX_DIR "${PROJECT_SOURCE_DIR}/meshfix/" )
 set(JMESHEXT_DIR "${MESHFIX_DIR}/JMeshExt-1.0alpha_src/")
 set(JMESH_DIR "${JMESHEXT_DIR}/JMeshLib-1.2/")
@@ -52,7 +53,8 @@ if (VERBOSE_DEBUG)
   add_definitions(-DVERBOSE_DEBUG)
 endif ()
 
-file(GLOB SRCFILES                    "${PROJECT_SOURCE_DIR}/*.cpp")
+file(GLOB SRCFILES                    "${PROJECT_SOURCE_DIR}/*.cpp"
+                                      "${PROJECT_SOURCE_DIR}/extrap_cage/*.cpp")
 
 # Tetgen, CollisionDetection, and Eltopo don't use CMAKE, so add their source
 # files directly

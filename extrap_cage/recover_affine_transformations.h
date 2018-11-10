@@ -1,4 +1,4 @@
-#include <Eigen>
+#include <Eigen/Core>
 
 // Given two meshes having a one-to-one vertex and face correspondence, return a
 // list of matrices and transformations such that the ith such pair is an affine
@@ -15,9 +15,9 @@
 //   FT   #F by 3 matrix where the ith row of T is the translation vector for
 //       the ith face
 
-void recover_face_transformations(
+void recover_affine_transformations(
   const Eigen::MatrixXd & V1,
   const Eigen::MatrixXd & V2,
-  const Eigen::MatrixXd & F,
+  const Eigen::MatrixXi & F,
   Eigen::MatrixXd & FA,
   Eigen::MatrixXd & FT);

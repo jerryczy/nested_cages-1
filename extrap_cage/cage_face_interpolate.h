@@ -1,4 +1,4 @@
-#include <Eigen>
+#include <Eigen/Core>
 
 // Given a mesh (V, F), and a coarse mesh (V_C, F_C) exterior to (V, F), return 
 // a matrix W such W(i, j) measures the extent to which vertex i on the coarse mesh
@@ -14,7 +14,7 @@
 
 void cage_face_interpolate(
   const Eigen::MatrixXd & V,
-  const Eigen::MatrixXd & F,
+  const Eigen::MatrixXi & F,
   const Eigen::MatrixXd & V_C,
-  const Eigen::MatrixXd & F_C,
+  const Eigen::MatrixXi & F_C,
   Eigen::MatrixXd & W);
