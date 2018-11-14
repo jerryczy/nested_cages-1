@@ -22,9 +22,9 @@ void extrap_cage(
     Eigen::MatrixXd A(3, 3);
     A << FA.row(f);
     Eigen::RowVector3d t = FT.row(f);
-    
+    Eigen::RowVector3d c = (1/3.0) * (V1.row(F(f,0)) + V1.row(F(f,1)) + V1.row(F(f,2)));
     for (int vc = 0; vc < V1_C.rows(); vc++) {
-      V2_C.row(vc) += W(vc, f) * (V1_C.row(vc) * A.transpose() + t);
+      V2_C.row(vc) += W(vc, f) * ((V1_C.row(vc) - c) * A.transpose() + c + t);
     }
   }
 }
