@@ -141,9 +141,9 @@ Energies implemented: None, DispStep, DispInitial, Volume, SurfARAP, VolARAP
     viewer.append_mesh();
     viewer.data().set_mesh(V1_C, F1_C);
     viewer.data().set_face_based(true);
-    viewer.append_mesh();
-    viewer.data().set_mesh(V2_C_original, F2_C_original);
-    viewer.data().set_face_based(true);
+    //viewer.append_mesh();
+    //viewer.data().set_mesh(V2_C_original, F2_C_original);
+    //viewer.data().set_face_based(true);
     viewer.append_mesh();
     viewer.data().set_mesh(V2_C, F1_C);
     viewer.data().set_face_based(true);

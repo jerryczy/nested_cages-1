@@ -1,5 +1,7 @@
 #include "extrap_cage.h"
-#include <igl/point_mesh_squared_distance.h>
+#include <igl/per_vertex_normals.h>
+#include <igl/ray_mesh_intersect.h>
+#include <igl/barycentric_to_global.h>
 #include <igl/barycentric_coordinates.h>
 
 void extrap_cage(
@@ -13,16 +15,18 @@ void extrap_cage(
   V2_C = V1_C.replicate(1, 1);
   Eigen::MatrixXd V2_C_inc = Eigen::MatrixXd::Zero(V2_C.rows(), 3);
   
-  Eigen::VectorXd sqrD;
-  Eigen::VectorXi I;
-  Eigen::MatrixXd C;
-  igl::point_mesh_squared_distance(V1, V1_C, F_C, sqrD, I, C);
+  Eigen::MatrixXd N;
+  igl::per_vertex_normals(V1, F, N);
   
   Eigen::VectorXd total_vertex_weights = Eigen::VectorXd::Zero(V2_C.rows());
   
   for (int vi = 0; vi < V1.rows(); vi++) {
-    Eigen::RowVector3i coarse_face = F_C.row(I[vi]);
-    Eigen::RowVector3d coarse_point = C.row(vi);
+    igl::Hit hit;
+    igl::ray_mesh_intersect(V1.row(vi), N.row(vi), V1_C, F_C, hit);
+    Eigen::MatrixXd bc(1, 3);
+    bc << hit.id, hit.u, hit.v;
+    Eigen::RowVector3i coarse_face = F_C.row(hit.id);
+    Eigen::RowVector3d coarse_point = igl::barycentric_to_global(V1_C, F_C, bc);
     
     Eigen::RowVector3d a = V1_C.row(coarse_face[0]);
     Eigen::RowVector3d b = V1_C.row(coarse_face[1]);
