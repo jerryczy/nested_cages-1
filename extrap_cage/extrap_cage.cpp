@@ -15,16 +15,16 @@ void extrap_cage(
   Eigen::MatrixXd W;
   cage_face_interpolate(V1, F, V1_C, F_C, W);
   
-  Eigen::MatrixXd FA, FT;
-  recover_affine_transformations(V1, V2, F, FA, FT);
+  Eigen::MatrixXd VA;
+  recover_affine_transformations(V1, V2, F, VA);
   
-  for (int f = 0; f < F.rows(); f++) {
+  for (int vi = 0; vi < V1_C.rows(); vi++) {
     Eigen::MatrixXd A(3, 3);
-    A << FA.row(f);
-    Eigen::RowVector3d t = FT.row(f);
-    Eigen::RowVector3d c = (1/3.0) * (V1.row(F(f,0)) + V1.row(F(f,1)) + V1.row(F(f,2)));
-    for (int vc = 0; vc < V1_C.rows(); vc++) {
-      V2_C.row(vc) += W(vc, f) * ((V1_C.row(vc) - c) * A.transpose() + c + t);
+    Eigen::Vector3d t;
+    A << VA.block(vi, 0, 1, 9);
+    t << VA.block(vi, 9, 1, 3);
+    for (int vci = 0; vci < V1_C.rows(); vci++) {
+      V2_C.row(vci) += W(vci, vi) * /*?*/;
     }
   }
 }
