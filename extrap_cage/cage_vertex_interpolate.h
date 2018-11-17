@@ -2,7 +2,7 @@
 
 // Given a mesh (V, F), and a coarse mesh (V_C, F_C) exterior to (V, F), return 
 // a matrix W such W(i, j) measures the extent to which vertex i on the coarse mesh
-// is "influenced" by face j on the *fine* mesh.
+// is "influenced" by vertex j on the *fine* mesh.
 //
 // Inputs:
 //   V    #V by 3 matrix of vertices for fine mesh
@@ -12,7 +12,7 @@
 // Outpts:
 //   W    #V_C by F matrix of weights with each row summing to one.
 
-void cage_face_interpolate(
+void cage_vertex_interpolate(
   const Eigen::MatrixXd & V,
   const Eigen::MatrixXi & F,
   const Eigen::MatrixXd & V_C,
