@@ -121,32 +121,64 @@ Energies implemented: None, DispStep, DispInitial, Volume, SurfARAP, VolARAP
   }
   
   // TODO: move this functionality to a separate file
+  // ./nested_cages extrap <frame_basename> <initial_cage> <num_frames> <instantaneous> [comparison_cage]
   if (strncmp(argv[1], "extrap", 4) == 0) {
-    MatrixXd V1, V2, V1_C, V2_C_original, V2_C;
-    MatrixXi F, F1_C, F2_C_original;
-    if (!read_triangle_mesh(argv[2],V1,F) ||
-        !read_triangle_mesh(argv[3],V2,F) ||
-        !read_triangle_mesh(argv[4],V1_C,F1_C) ||
-        !read_triangle_mesh(argv[5],V2_C_original,F2_C_original)){
-      cout << "unable to read input file"  << endl;
-      return 0;
+    int num_frames = atoi(argv[4]);
+    MatrixXd V[num_frames];
+    MatrixXi F;
+    MatrixXd V_C[num_frames];
+    MatrixXi F_C;
+    read_triangle_mesh(argv[3], V_C[0], F_C);
+    
+    char *finemesh1_name = new char[strlen(argv[2]) + 6];
+    char *finemesh2_name = new char[strlen(argv[2]) + 6];
+    if (strcmp(argv[5], "y") == 0) {
+      asprintf(&finemesh1_name, "%s_%04d.obj", argv[2], 0);
+      asprintf(&finemesh2_name, "%s_%04d.obj", argv[2], num_frames - 1);
+      read_triangle_mesh(finemesh1_name, V[0], F);
+      read_triangle_mesh(finemesh2_name, V[num_frames - 1], F);
+      extrap_cage(V[0], V[num_frames - 1], F, V_C[0], F_C, V_C[num_frames - 1]);
     }
-    extrap_cage(V1, V2, F, V1_C, F1_C, V2_C);
-
-    viewer.data().set_mesh(V1, F);
+    else {
+      for (int i = 0; i < num_frames - 1; i++) {
+        asprintf(&finemesh1_name, "%s_%04d.obj", argv[2], i);
+        asprintf(&finemesh2_name, "%s_%04d.obj", argv[2], i+1);
+        read_triangle_mesh(finemesh1_name, V[i], F);
+        read_triangle_mesh(finemesh2_name, V[i+1], F);
+        extrap_cage(V[i], V[i+1], F, V_C[i], F_C, V_C[i+1]);
+      }
+    }
+    
+    viewer.data().set_mesh(V[0], F);
     viewer.data().set_face_based(true);
     viewer.append_mesh();
-    viewer.data().set_mesh(V2, F);
+    viewer.data().set_mesh(V[num_frames-1], F);
     viewer.data().set_face_based(true);
     viewer.append_mesh();
-    viewer.data().set_mesh(V1_C, F1_C);
+    viewer.data().set_mesh(V_C[0], F_C);
     viewer.data().set_face_based(true);
-    //viewer.append_mesh();
-    //viewer.data().set_mesh(V2_C_original, F2_C_original);
-    //viewer.data().set_face_based(true);
     viewer.append_mesh();
-    viewer.data().set_mesh(V2_C, F1_C);
+    viewer.data().set_mesh(V_C[num_frames-1], F_C);
     viewer.data().set_face_based(true);
+    
+    if (argc > 6) {
+      MatrixXd V_C_comp;
+      MatrixXi F_C_comp;
+      read_triangle_mesh(argv[6], V_C_comp, F_C_comp);
+      viewer.append_mesh();
+      viewer.data().set_mesh(V_C_comp, F_C_comp);
+      viewer.data().set_face_based(true);
+    }
+    
+    /*
+    for (int i = 0; i < num_frames; i++) {
+      if (i > 0)
+        viewer.append_mesh();
+      viewer.data().set_mesh(V[i], F);
+      viewer.append_mesh();
+      viewer.data().set_mesh(V_C[i], F_C);
+      viewer.data().set_face_based(true);
+    }*/
     
     // TODO: this is not the best interface but will do for now
     view_cages(viewer);
