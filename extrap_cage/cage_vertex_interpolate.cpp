@@ -27,8 +27,8 @@ void cage_vertex_interpolate(
     Eigen::RowVector3d c = V.row(closest_face[2]);
     Eigen::RowVector3d l;
     igl::barycentric_coordinates(v, a, b, c, l);
-    W(vci, closest_face[0]) = 1 - l[0];
-    W(vci, closest_face[1]) = 1 - l[1];
-    W(vci, closest_face[2]) = 1 - l[2];
+    W(vci, closest_face[0]) = l[0];
+    W(vci, closest_face[1]) = l[1];
+    W(vci, closest_face[2]) = l[2];
   }
 }

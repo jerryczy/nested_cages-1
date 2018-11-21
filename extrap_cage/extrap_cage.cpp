@@ -18,13 +18,13 @@ void extrap_cage(
   Eigen::MatrixXd VA;
   recover_affine_transformations(V1, V2, F, VA);
   
-  for (int vi = 0; vi < V1_C.rows(); vi++) {
-    Eigen::MatrixXd A(3, 3);
-    Eigen::Vector3d t;
-    A << VA.block(vi, 0, 1, 9);
+  for (int vi = 0; vi < V1.rows(); vi++) {
+    Eigen::Matrix3d A;
+    Eigen::RowVector3d t;
+    A << VA.block(vi, 0, 1, 3), VA.block(vi, 3, 1, 3), VA.block(vi, 6, 1, 3);
     t << VA.block(vi, 9, 1, 3);
     for (int vci = 0; vci < V1_C.rows(); vci++) {
-      V2_C.row(vci) += W(vci, vi) * A * (V1_C.row(vci) - V1.row(vi)) + t + V1.row(vi);
+      V2_C.row(vci) += W(vci, vi) * ((V1_C.row(vci) - V1.row(vi)) * A.transpose() + t + V1.row(vi));
     }
   }
 }
