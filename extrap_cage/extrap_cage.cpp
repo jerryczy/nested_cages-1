@@ -34,13 +34,13 @@ void extrap_cage(
     Eigen::RowVector3d l;
     igl::barycentric_coordinates(coarse_point, a, b, c, l);
     
-    V2_C_inc.row(coarse_face[0]) += (1 - l[0]) * (V2.row(vi) - V1.row(vi));
-    V2_C_inc.row(coarse_face[1]) += (1 - l[1]) * (V2.row(vi) - V1.row(vi));
-    V2_C_inc.row(coarse_face[2]) += (1 - l[2]) * (V2.row(vi) - V1.row(vi));
+    V2_C_inc.row(coarse_face[0]) += l[0] * (V2.row(vi) - V1.row(vi));
+    V2_C_inc.row(coarse_face[1]) += l[1] * (V2.row(vi) - V1.row(vi));
+    V2_C_inc.row(coarse_face[2]) += l[2] * (V2.row(vi) - V1.row(vi));
     
-    total_vertex_weights[coarse_face[0]] += 1 - l[0];
-    total_vertex_weights[coarse_face[1]] += 1 - l[1];
-    total_vertex_weights[coarse_face[2]] += 1 - l[2];
+    total_vertex_weights[coarse_face[0]] += l[0];
+    total_vertex_weights[coarse_face[1]] += l[1];
+    total_vertex_weights[coarse_face[2]] += l[2];
   }
   
   for (int vci = 0; vci < V2_C.rows(); vci++) {
