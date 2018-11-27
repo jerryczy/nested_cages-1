@@ -48,4 +48,22 @@ void extrap_cage(
   }
   
   V2_C += V2_C_inc;
+  
+  // patchwork: find portruding translations and translate corresponding triangles
+  for (int vi = 0; vi < V1.rows(); vi++) {
+    if ((V2.row(vi) - V1.row(vi)).dot(N.row(vi)) > 0) {
+      igl::Hit hit;
+      igl::ray_mesh_intersect(V1.row(vi), V2.row(vi) - V1.row(vi), V2_C, F_C, hit);
+      Eigen::MatrixXd bc(1, 3);
+      bc << hit.id, hit.u, hit.v;
+      Eigen::RowVector3i coarse_face = F_C.row(hit.id);
+      Eigen::RowVector3d coarse_point = igl::barycentric_to_global(V2_C, F_C, bc);
+      
+      if ((V2.row(vi) - V1.row(vi)).norm() > (coarse_point - V1.row(vi)).norm()) {
+        V2_C.row(coarse_face[0]) += V2.row(vi) - coarse_point;
+        V2_C.row(coarse_face[1]) += V2.row(vi) - coarse_point;
+        V2_C.row(coarse_face[2]) += V2.row(vi) - coarse_point;
+      }
+    }
+  }
 }
