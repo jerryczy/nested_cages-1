@@ -2,7 +2,7 @@
 #include <cmath>
 #include <Eigen/Dense>
 
-#define EPS 7e-3
+#define EPS 1e-4
 
 void mvc(
   const Eigen::MatrixXd & V,
@@ -10,7 +10,7 @@ void mvc(
   const Eigen::MatrixXd & X,
   Eigen::MatrixXd & W)
 {
-  W = Eigen::MatrixXd(X.rows(), V.rows());
+  W = Eigen::MatrixXd::Zero(X.rows(), V.rows());
   for (int xi = 0; xi < X.rows(); xi++) {
     Eigen::RowVector3d x = X.row(xi);
     
@@ -68,9 +68,9 @@ void mvc(
         continue;
       }
         
-      W(xi, p1i) = (th1 - c2*th3 - c3*th2) / (D[p1i] * sin(th2) * s3);
-      W(xi, p2i) = (th2 - c3*th1 - c1*th3) / (D[p2i] * sin(th3) * s1);
-      W(xi, p3i) = (th3 - c1*th2 - c2*th1) / (D[p3i] * sin(th1) * s2);
+      W(xi, p1i) += (th1 - c2*th3 - c3*th2) / (D[p1i] * sin(th2) * s3);
+      W(xi, p2i) += (th2 - c3*th1 - c1*th3) / (D[p2i] * sin(th3) * s1);
+      W(xi, p3i) += (th3 - c1*th2 - c2*th1) / (D[p3i] * sin(th1) * s2);
     }
     
     W.row(xi).array() /= W.row(xi).sum();
